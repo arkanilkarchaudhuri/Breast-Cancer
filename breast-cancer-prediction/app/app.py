@@ -85,6 +85,27 @@ st.markdown(
 # -----------------------------------------------------------------------------
 # 2. ARTIFACT INGESTION & CACHING
 # -----------------------------------------------------------------------------
+def find_project_root() -> str:
+    """Resolve the repo root robustly across local runs and cloud mounts."""
+    candidates = [
+        Path(__file__).resolve().parent.parent,
+        Path.cwd(),
+        Path("/mount/src"),
+        Path("/workspace"),
+    ]
+
+    for candidate in candidates:
+        if candidate.exists():
+            if (candidate / "models").exists() and (candidate / "requirements.txt").exists():
+                return str(candidate)
+
+            nested = candidate / "breast-cancer-prediction"
+            if nested.exists() and (nested / "models").exists() and (nested / "requirements.txt").exists():
+                return str(nested)
+
+    return str(Path(__file__).resolve().parent.parent)
+
+
 @st.cache_resource(show_spinner="Loading predictive models & clinical artifacts...")
 def load_artifacts() -> Tuple[Any, Dict[str, Any], Any]:
     """
@@ -96,19 +117,20 @@ def load_artifacts() -> Tuple[Any, Dict[str, Any], Any]:
         encoders: Mapping dictionaries and feature schemas.
         model: Trained best classifier (XGBoost).
     """
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    base_dir = find_project_root()
 
     scaler_path = os.path.join(base_dir, "models", "scaler.pkl")
     encoders_path = os.path.join(base_dir, "models", "encoders.pkl")
     model_path = os.path.join(base_dir, "models", "best_model.pkl")
 
-    if not os.path.exists(scaler_path):
-        scaler_path = "models/scaler.pkl"
-        encoders_path = "models/encoders.pkl"
-        model_path = "models/best_model.pkl"
-
-    if not os.path.exists(model_path):
-        raise FileNotFoundError(f"Model artifact not found at {model_path}. Please execute src/train.py first.")
+    missing = [p for p in (scaler_path, encoders_path, model_path) if not os.path.exists(p)]
+    if missing:
+        formatted = "\n".join(f"- {p}" for p in missing)
+        raise FileNotFoundError(
+            "Model artifacts were not found under the resolved project root. "
+            f"Resolved project root: {base_dir}\nMissing files:\n{formatted}\n"
+            "Please verify that the repo is mounted correctly and that the model files exist."
+        )
 
     scaler = joblib.load(scaler_path)
     encoders = joblib.load(encoders_path)
