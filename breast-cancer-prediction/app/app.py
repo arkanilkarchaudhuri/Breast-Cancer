@@ -24,58 +24,121 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Custom CSS for modern medical UI styling
+# Custom CSS for a restrained clinical operations interface
 st.markdown(
     """
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+
+    :root {
+        --hospital-navy: #102a43;
+        --hospital-blue: #176b87;
+        --hospital-teal: #0f766e;
+        --ink: #243b53;
+        --muted: #627d98;
+        --line: #d9e2ec;
+        --canvas: #f4f7f9;
+        --panel: #ffffff;
+        --critical: #b42318;
+        --critical-bg: #fff4f2;
+        --stable: #067647;
+        --stable-bg: #effaf4;
+    }
+
+    html, body, [class*="css"] { font-family: 'Source Sans 3', 'Segoe UI', sans-serif; color: var(--ink); }
+    .stApp { background: var(--canvas); }
+    [data-testid="stHeader"] { background: rgba(244, 247, 249, 0.94); }
+    [data-testid="stAppViewContainer"] > .main { padding-top: 2.25rem; }
+    [data-testid="stSidebar"] { background: var(--hospital-navy); border-right: 1px solid #1f4664; }
+    [data-testid="stSidebar"] * { color: #e6eef5; }
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p { color: #b9cbd9; }
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] strong { color: #f7fbfd; }
+    [data-testid="stSidebar"] code {
+        background: #e8f0f5;
+        border: 1px solid #9bb7c7;
+        border-radius: 3px;
+        color: #102a43;
+        font-family: 'IBM Plex Mono', monospace;
+        font-weight: 500;
+        padding: 0.12rem 0.3rem;
+    }
+    [data-testid="stSidebar"] hr { border-color: #35556d; margin: 1.35rem 0; }
+    [data-testid="stSidebar"] [data-testid="stImage"] { background: #e8f0f5; padding: 0.35rem; border-radius: 4px; margin-bottom: 0.75rem; }
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 { color: #ffffff; letter-spacing: 0; }
+    [data-testid="stSidebar"] [data-baseweb="select"] > div { background: #173c58; border-color: #4b7188; }
+    [data-testid="stRadio"] label { color: #e6eef5; }
+    [data-testid="stRadio"] [data-testid="stMarkdownContainer"] p { color: #e6eef5; }
+    [data-testid="stRadio"] input:checked + div { border-color: #6bc5bf; background: #6bc5bf; }
+    .sidebar-brand {
+        border-left: 3px solid #6bc5bf;
+        color: #ffffff;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.72rem;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        line-height: 1.5;
+        padding-left: 0.7rem;
+        text-transform: uppercase;
+    }
+    .main-title { border-left: 5px solid var(--hospital-teal); color: var(--hospital-navy); font-size: 2.15rem; font-weight: 700; line-height: 1.05; margin-bottom: 0.5rem; padding-left: 1rem; }
+    .sub-title { color: var(--muted); font-size: 1rem; margin: 0 0 2rem 1.35rem; }
+    [data-testid="stForm"] { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; box-shadow: 0 2px 8px rgba(16, 42, 67, 0.06); padding: 1.4rem 1.5rem 1rem; }
+    [data-testid="stForm"] h5 { border-bottom: 2px solid #d7eceb; color: var(--hospital-navy); font-size: 0.84rem; letter-spacing: 0.04em; padding-bottom: 0.6rem; text-transform: uppercase; }
+    [data-testid="stTextInput"] label, [data-testid="stNumberInput"] label, [data-testid="stSelectbox"] label, [data-testid="stFileUploader"] label { color: var(--ink); font-size: 0.88rem; font-weight: 600; }
+    [data-baseweb="input"] > div, [data-baseweb="select"] > div { background: #fbfcfd; border-color: #bcccdc; border-radius: 3px; }
+    [data-baseweb="input"]:focus-within > div, [data-baseweb="select"]:focus-within > div { border-color: var(--hospital-teal); box-shadow: 0 0 0 1px var(--hospital-teal); }
+    .stButton > button, [data-testid="stFormSubmitButton"] button, [data-testid="stDownloadButton"] button { background: var(--hospital-blue); border: 1px solid var(--hospital-blue); border-radius: 3px; color: white; font-weight: 600; min-height: 2.6rem; }
+    .stButton > button:hover, [data-testid="stFormSubmitButton"] button:hover, [data-testid="stDownloadButton"] button:hover { background: var(--hospital-navy); border-color: var(--hospital-navy); color: white; }
+    [data-testid="stMetric"] { background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--hospital-teal); border-radius: 3px; box-shadow: 0 1px 4px rgba(16, 42, 67, 0.04); padding: 1rem 1.1rem; }
+    [data-testid="stMetricLabel"] { color: var(--muted); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+    [data-testid="stMetricValue"] { color: var(--hospital-navy); font-family: 'IBM Plex Mono', monospace; font-size: 1.5rem; }
+    [data-testid="stProgressBar"] > div > div { background: var(--hospital-teal); }
+    [data-testid="stDataFrame"] { border: 1px solid var(--line); }
+    [data-testid="stAlert"] { border-radius: 3px; }
+    h2, h3, h4, h5 { color: var(--hospital-navy); letter-spacing: 0; }
+    h2 { border-bottom: 1px solid var(--line); padding-bottom: 0.65rem; }
     .main-title {
         font-size: 2.2rem;
-        font-weight: 800;
-        color: #1e3d59;
-        margin-bottom: 0.2rem;
-    }
-    .sub-title {
-        font-size: 1.05rem;
-        color: #555555;
-        margin-bottom: 1.5rem;
     }
     .metric-card {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 3px;
         padding: 1rem;
         text-align: center;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        box-shadow: 0 1px 4px rgba(16, 42, 67, 0.04);
     }
     .high-risk-card {
-        background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
-        border: 2px solid #e53e3e;
-        border-radius: 12px;
-        padding: 1.5rem;
+        background: var(--critical-bg);
+        border: 1px solid #f0b5ae;
+        border-left: 5px solid var(--critical);
+        border-radius: 3px;
+        padding: 1.2rem 1.35rem;
         margin: 1rem 0;
-        box-shadow: 0 4px 6px -1px rgba(229, 62, 62, 0.2);
     }
     .low-risk-card {
-        background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
-        border: 2px solid #38a169;
-        border-radius: 12px;
-        padding: 1.5rem;
+        background: var(--stable-bg);
+        border: 1px solid #a6d8bd;
+        border-left: 5px solid var(--stable);
+        border-radius: 3px;
+        padding: 1.2rem 1.35rem;
         margin: 1rem 0;
-        box-shadow: 0 4px 6px -1px rgba(56, 161, 105, 0.2);
     }
     .risk-header {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         font-weight: 700;
         margin-bottom: 0.5rem;
     }
     .disclaimer-box {
-        background: #ebf8ff;
-        border-left: 4px solid #3182ce;
-        padding: 0.85rem 1.2rem;
-        border-radius: 6px;
-        color: #2b6cb0;
-        font-size: 0.95rem;
+        background: #edf5f8;
+        border: 1px solid #c4dce5;
+        border-left: 4px solid var(--hospital-blue);
+        border-radius: 3px;
+        color: #28566b;
+        font-size: 0.9rem;
+        line-height: 1.45;
         margin-top: 2rem;
+        padding: 0.85rem 1.2rem;
     }
     </style>
     """,
@@ -302,7 +365,7 @@ def get_top_contributing_features(
 # -----------------------------------------------------------------------------
 def main() -> None:
     # Header Section
-    st.markdown('<div class="main-title">🎗️ Breast Cancer Risk Prediction</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-title">Breast Cancer Risk Prediction</div>', unsafe_allow_html=True)
     st.markdown(
         '<div class="sub-title">Clinical Diagnostic Decision Support System & Early Malignancy Risk Stratification</div>',
         unsafe_allow_html=True,
@@ -328,7 +391,7 @@ def main() -> None:
     optimal_threshold = float(encoders["decision_threshold"])
 
     # Sidebar Navigation
-    st.sidebar.image("https://img.icons8.com/color/96/000000/medical-doctor.png", width=70)
+    st.sidebar.markdown('<div class="sidebar-brand">Clinical Operations<br>Live Demo</div>', unsafe_allow_html=True)
     st.sidebar.title("Navigation")
     app_mode = st.sidebar.radio(
         "Select Prediction Mode:",
@@ -345,14 +408,14 @@ def main() -> None:
     # MODE 1: SINGLE PATIENT PREDICTION
     # =========================================================================
     if app_mode == "Single Patient Prediction":
-        st.subheader("📋 Patient Diagnostic Intake Form")
+        st.subheader("Patient Diagnostic Intake Form")
         st.markdown("Enter patient demographic, lifestyle, physiological, and clinical imaging indicators below.")
 
         with st.form("single_patient_form"):
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                st.markdown("##### 👤 Demographics & Lifestyle")
+                st.markdown("##### Demographics & Lifestyle")
                 age = st.number_input("Age (Years)", min_value=20, max_value=90, value=50, step=1)
                 gender = st.selectbox("Gender", options=["Female", "Male"], index=0)
                 smoking = st.selectbox("Smoking History", options=["No", "Yes"], index=0)
@@ -361,7 +424,7 @@ def main() -> None:
                 annual_income = st.number_input("Annual Income (USD)", min_value=10000, max_value=150000, value=65000, step=2500)
 
             with col2:
-                st.markdown("##### 🩺 Clinical & Physiological")
+                st.markdown("##### Clinical & Physiological")
                 bmi = st.number_input("BMI (kg/m²)", min_value=10.0, max_value=60.0, value=26.5, step=0.1, format="%.1f")
                 blood_pressure = st.number_input("Systolic Blood Pressure (mmHg)", min_value=80, max_value=200, value=125, step=1)
                 cholesterol = st.number_input("Total Cholesterol (mg/dL)", min_value=100, max_value=350, value=210, step=1)
@@ -370,7 +433,7 @@ def main() -> None:
                 physical_activity = st.selectbox("Physical Activity Level", options=["Moderate", "Low", "High"], index=0)
 
             with col3:
-                st.markdown("##### 🔬 Oncological & Screening Indicators")
+                st.markdown("##### Oncological & Screening Indicators")
                 tumor_size = st.number_input("Tumor / Lesion Size (cm)", min_value=0.0, max_value=10.0, value=2.0, step=0.1, format="%.2f")
                 mammogram = st.selectbox("Mammogram Result", options=["Normal", "Suspicious", "Abnormal"], index=0)
                 genetic_mutation = st.selectbox("Genetic Mutation (e.g. BRCA1/2)", options=["Negative", "Positive"], index=0)
@@ -416,7 +479,7 @@ def main() -> None:
                 is_high_risk = prob_malignant >= optimal_threshold
 
                 st.markdown("---")
-                st.subheader("🎯 Risk Assessment & Diagnostic Profiling")
+                st.subheader("Risk Assessment & Diagnostic Profiling")
 
                 # Diagnostic Status Banner
                 if is_high_risk:
@@ -460,7 +523,7 @@ def main() -> None:
                     st.metric(label="Clinical Triage Status", value="HIGH RISK" if is_high_risk else "LOW RISK")
 
                 # Top 3 Contributing Features
-                st.markdown("##### 🔍 Top 3 Primary Contributing Risk Drivers")
+                st.markdown("##### Top 3 Primary Contributing Risk Drivers")
                 top_features = get_top_contributing_features(model, raw_input_dict, encoders, top_k=3)
                 
                 fcol1, fcol2, fcol3 = st.columns(3)
@@ -486,7 +549,7 @@ def main() -> None:
     # MODE 2: BATCH COHORT UPLOAD
     # =========================================================================
     elif app_mode == "Batch Upload (CSV)":
-        st.subheader("📁 Batch Patient Cohort Screening")
+        st.subheader("Batch Patient Cohort Screening")
         st.markdown(
             "Upload a structured patient cohort CSV for high-throughput batch risk stratification. "
             "Post-diagnostic leakage columns (`Patient_ID`, `Biopsy_Result`, `Cancer_Stage`) will be safely stripped automatically."
@@ -559,7 +622,7 @@ def main() -> None:
                 low_risk_pct = (low_risk_count / total_patients) * 100
 
                 st.markdown("---")
-                st.markdown("##### 📊 Cohort Screening Summary")
+                st.markdown("##### Cohort Screening Summary")
 
                 scol1, scol2, scol3 = st.columns(3)
                 with scol1:
@@ -570,7 +633,7 @@ def main() -> None:
                     st.metric(label="Low Risk (Benign)", value=f"{low_risk_count:,} ({low_risk_pct:.1f}%)")
 
                 # Preview Data Table
-                st.markdown("##### 📋 Patient-by-Patient Risk Stratification Results")
+                st.markdown("##### Patient-by-Patient Risk Stratification Results")
                 
                 def highlight_risk(val: str) -> str:
                     if "HIGH RISK" in str(val):
